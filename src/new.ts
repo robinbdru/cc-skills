@@ -1,7 +1,9 @@
 import { ensureDir, exists } from "@std/fs";
-import { join } from "@std/path";
+import { dirname, fromFileUrl, join } from "@std/path";
 
 const SEGMENT_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+const TEMPLATE_PATH = join(dirname(fromFileUrl(import.meta.url)), "..", "skills", "new-skill", "template.md");
 
 /**
  * Validates a skill name or path like "new-skill" or "group/new-skill":
@@ -17,15 +19,11 @@ export function validateSkillName(name: string): void {
   }
 }
 
-/** Turns a hyphenated segment like "new-skill" into a heading like "New Skill". */
-function titleCase(segment: string): string {
-  return segment.split("-").map((word) => word[0].toUpperCase() + word.slice(1)).join(" ");
-}
-
-/** Minimal `SKILL.md` stub: empty description placeholder and a heading from the skill's leaf name. */
-export function skillStub(name: string): string {
+/** Builds a `SKILL.md` stub from this repo's skill template, filling in `name` with the skill's leaf directory name. */
+export async function skillStub(name: string): Promise<string> {
   const leaf = name.split("/").at(-1)!;
-  return `---\ndescription: \n---\n\n# ${titleCase(leaf)}\n\nTODO\n`;
+  const template = await Deno.readTextFile(TEMPLATE_PATH);
+  return template.replace("my-skill-name", leaf);
 }
 
 /**
@@ -51,6 +49,6 @@ export function skillExists(skillsRoot: string, name: string): Promise<boolean> 
 export async function scaffoldSkill(skillsRoot: string, name: string): Promise<string> {
   const dir = join(skillsRoot, ...name.split("/"));
   await ensureDir(dir);
-  await Deno.writeTextFile(join(dir, "SKILL.md"), skillStub(name));
+  await Deno.writeTextFile(join(dir, "SKILL.md"), await skillStub(name));
   return dir;
 }

@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 import { join } from "@std/path";
-import { findSkillConflict, scaffoldSkill, skillExists, validateSkillName } from "./new.ts";
+import { findSkillConflict, scaffoldSkill, skillExists, skillStub, validateSkillName } from "./new.ts";
 
 Deno.test("validateSkillName accepts hyphenated lowercase names, with or without a group", () => {
   validateSkillName("new-skill");
@@ -19,11 +19,23 @@ Deno.test("scaffoldSkill creates the directory and a SKILL.md stub", async () =>
     const dir = await scaffoldSkill(root, "new-skill");
     assertEquals(dir, join(root, "new-skill"));
     const content = await Deno.readTextFile(join(dir, "SKILL.md"));
-    assertEquals(content.startsWith("---\ndescription:"), true);
-    assertEquals(content.includes("# New Skill"), true);
+    assertEquals(content.startsWith("---\nname: new-skill"), true);
+    assertEquals(content.includes("Your skill instructions here..."), true);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test("skillStub fills in the name field from the template and keeps the rest", async () => {
+  const stub = await skillStub("new-skill");
+  assertEquals(stub.startsWith("---\nname: new-skill"), true);
+  assertEquals(stub.includes("description:"), true);
+  assertEquals(stub.includes("Your skill instructions here..."), true);
+});
+
+Deno.test("skillStub uses the leaf name for a grouped skill", async () => {
+  const stub = await skillStub("group/new-skill");
+  assertEquals(stub.startsWith("---\nname: new-skill"), true);
 });
 
 Deno.test("scaffoldSkill creates nested group directories", async () => {
