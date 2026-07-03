@@ -7,13 +7,13 @@ allowed-tools: Write Edit Read Bash(mkdir *)
 
 Scaffold a new skill under `skills/`, following this repo's conventions: a directory is either a **skill** (a leaf folder holding one `SKILL.md`) or a **group** (a folder with no `SKILL.md` of its own that only holds sibling skill folders, e.g. `plan/` holding `plan/research/`) — never both. Keep the body lean and push detail into supporting files only when they earn their token cost.
 
-A future CLI will let users pick skills to install into a project or globally, and optionally suffix their names on install. Directory names in this repo are the canonical, unsuffixed source — don't bake install-time naming into them.
+A future CLI will let users pick skills to install into a project or globally, and optionally prefix their names on install. Directory names in this repo are the canonical, unprefixed source — don't bake install-time naming into them.
 
 ## Workflow
 
 1. Clarify anything you can't infer from the request:
    - What the skill does and when it should trigger
-   - Directory name — short, hyphenated, canonical (no destination-specific suffix)
+   - Directory name — short, hyphenated, canonical (no destination-specific prefix)
    - Placement: does this join an existing group, start a new group, or stand alone? List `skills/` and check whether the target directory already has a `SKILL.md` (it's a skill — do not add another) or already groups sibling skills (add a new sibling skill folder inside it, don't put a `SKILL.md` directly in the group)
    - Whether Claude should auto-invoke it or only the user via `/name` (`disable-model-invocation: true`) — reserve this for skills with side effects (writes, sends, deploys)
    - Whether it needs scripts, references, or a template, or plain instructions are enough

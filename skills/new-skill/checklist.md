@@ -3,7 +3,7 @@
 Before finishing a new or edited skill, verify:
 
 - [ ] `description` states what it does + when to use it, third person, key terms first
-- [ ] Directory name is short, lowercase-hyphenated, canonical (no destination-specific suffix)
+- [ ] Directory name is short, lowercase-hyphenated, canonical (no destination-specific prefix)
 - [ ] Placement respects the skill/group split: the folder either has a `SKILL.md` (a skill) or only holds sibling skill folders (a group) — never both
 - [ ] Frontmatter has only the fields the skill actually uses — no empty leftover keys
 - [ ] Body assumes Claude already knows common concepts; every paragraph earns its token cost
