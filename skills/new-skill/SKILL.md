@@ -20,7 +20,7 @@ A future CLI will let users pick skills to install into a project or globally, a
 
 2. Create `skills/<name>/SKILL.md`, or `skills/<group>/<name>/SKILL.md` when it belongs in a group.
 
-3. Fill frontmatter using [../../templates/new-skill-template.md](../../templates/new-skill-template.md) as the field reference. Copy over only the fields this skill actually uses — `description` is nearly always needed, most others are not. Never leave unused fields as empty keys in the final file.
+3. Fill frontmatter using [./template.md](./template.md) as the field reference. Copy over only the fields this skill actually uses — `description` is nearly always needed, most others are not. Never leave unused fields as empty keys in the final file.
 
 4. Write the body:
    - Third person, no filler — assume Claude already knows common concepts, every line should earn its cost
@@ -34,5 +34,5 @@ A future CLI will let users pick skills to install into a project or globally, a
 
 ## Additional resources
 
-- Full frontmatter field reference: [../../templates/new-skill-template.md](../../templates/new-skill-template.md)
+- Full frontmatter field reference: [./template.md](./template.md)
 - Pre-flight checklist: [checklist.md](checklist.md)
