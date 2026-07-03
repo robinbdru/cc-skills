@@ -5,10 +5,10 @@ import { copySkillTo, expandHome } from "./copy.ts";
 
 Deno.test("expandHome expands a leading ~ using HOME", () => {
   const original = Deno.env.get("HOME");
-  Deno.env.set("HOME", "/home/robin");
+  Deno.env.set("HOME", "/home/testuser");
   try {
-    assertEquals(expandHome("~"), "/home/robin");
-    assertEquals(expandHome("~/.claude/skills"), "/home/robin/.claude/skills");
+    assertEquals(expandHome("~"), "/home/testuser");
+    assertEquals(expandHome("~/.claude/skills"), "/home/testuser/.claude/skills");
   } finally {
     if (original === undefined) Deno.env.delete("HOME");
     else Deno.env.set("HOME", original);
