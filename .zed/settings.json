@@ -1,0 +1,8 @@
+{
+  "lsp": { "deno": { "settings": { "deno": { "enable": true } } } },
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["deno", "!vtsls", "!typescript-language-server", "!eslint"],
+    },
+  },
+}
