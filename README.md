@@ -14,7 +14,7 @@ Launches an interactive menu so you don't need to remember the subcommand names 
 
 ```
 $ deno task cli
-? What do you want to do? ›
+? What do you want to do?
 ❯ Copy skills
   New skill
   Help
@@ -30,7 +30,7 @@ Scaffolds a new skill's `SKILL.md` under the current project's local `.claude/sk
 
 ```
 $ deno task cli new my-skill
-Created .claude/skills/my-skill/SKILL.md
+Created /Users/you/my-project/.claude/skills/my-skill/SKILL.md
 ```
 
 ## `deno task cli copy`
@@ -48,6 +48,7 @@ $ deno task cli copy
 ? Which skills do you want to copy? › All skills
 ? Destination folder (a .claude/skills/ folder will be found or created inside it) › ../other-project
 ? Prefix to prepend to copied skill names (leave empty for none) › 
+? Include each skill's group folder name in the copied name? › No
 
 About to copy:
   new-skill -> ../other-project/.claude/skills/new-skill
