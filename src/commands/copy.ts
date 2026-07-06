@@ -63,14 +63,9 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
   });
   const prefix = prefixInput.trim() || undefined;
 
-  const anyGrouped = selected.some((s) => s.name.includes("/"));
-  const includeGroup = anyGrouped
-    ? await Confirm.prompt("Include each skill's group folder name in the copied name?")
-    : false;
-
   const plan = selected.map((skill) => ({
     skill,
-    dirName: targetDirName(skill, { prefix, includeGroup }),
+    dirName: targetDirName(skill, { prefix }),
   }));
 
   const dirNames = plan.map((p) => p.dirName);
@@ -81,7 +76,7 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
       const colliding = plan.filter((p) => p.dirName === dup).map((p) => p.skill.name);
       console.error(`  "${dup}" <- ${colliding.join(", ")}`);
     }
-    console.error("Enable 'include group folder name' or narrow your selection, then try again.");
+    console.error("Add a prefix or narrow your selection, then try again.");
     return;
   }
 
@@ -101,7 +96,6 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
     console.log(`  ${skill.name} -> ${join(destination, dirName)}`);
   }
   console.log(`Prefix: ${prefix ?? "(none)"}`);
-  console.log(`Include group folder: ${includeGroup ? "yes" : "no"}`);
   console.log(`Destination: ${destination}`);
   const proceed = await Confirm.prompt("Proceed?");
   if (!proceed) {

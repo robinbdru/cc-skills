@@ -38,25 +38,5 @@ Deno.test("targetDirName with no options returns the skill's own name", () => {
 
 Deno.test("targetDirName prepends the prefix", () => {
   assertEquals(targetDirName({ name: "commit", dir: "/unused" }, { prefix: "rb" }), "rb-commit");
-});
-
-Deno.test("targetDirName folds the group path in after the prefix when includeGroup is set", () => {
-  assertEquals(
-    targetDirName({ name: "plan/research", dir: "/unused" }, { prefix: "rb", includeGroup: true }),
-    "rb-plan-research",
-  );
-});
-
-Deno.test("targetDirName can include the group without a prefix", () => {
-  assertEquals(
-    targetDirName({ name: "plan/research", dir: "/unused" }, { includeGroup: true }),
-    "plan-research",
-  );
-});
-
-Deno.test("targetDirName's includeGroup is a no-op for top-level skills", () => {
-  assertEquals(
-    targetDirName({ name: "commit", dir: "/unused" }, { prefix: "rb", includeGroup: true }),
-    "rb-commit",
-  );
+  assertEquals(targetDirName({ name: "plan/research", dir: "/unused" }, { prefix: "rb" }), "rb-research");
 });

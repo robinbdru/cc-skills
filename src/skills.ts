@@ -67,26 +67,17 @@ export async function discoverSkills(skillsRoot: string): Promise<SkillEntry[]> 
 export interface NamingOptions {
   /** Prepended first, e.g. "rb". */
   prefix?: string;
-  /** Fold the skill's group-path segments in after the prefix. */
-  includeGroup?: boolean;
 }
 
 /**
- * Resolves the directory name a skill gets at the destination.
+ * Resolves the directory name a skill gets at the destination: its own leaf
+ * name (any group segments are dropped), optionally prefixed.
  *
- * "plan/research" + { prefix: "rb", includeGroup: true }  -> "rb-plan-research"
- * "plan/research" + { prefix: "rb", includeGroup: false } -> "rb-research"
- * "new-skill"     + { prefix: "rb" }                      -> "rb-new-skill"
- * "new-skill"     + {}                                    -> "new-skill"
+ * "plan/research" + { prefix: "rb" } -> "rb-research"
+ * "new-skill"     + { prefix: "rb" } -> "rb-new-skill"
+ * "new-skill"     + {}               -> "new-skill"
  */
 export function targetDirName(skill: SkillEntry, options: NamingOptions = {}): string {
-  const parts = skill.name.split("/");
-  const leaf = parts.at(-1)!;
-  const group = parts.slice(0, -1);
-  const segments = [
-    ...(options.prefix ? [options.prefix] : []),
-    ...(options.includeGroup ? group : []),
-    leaf,
-  ];
-  return segments.join("-");
+  const leaf = skill.name.split("/").at(-1)!;
+  return options.prefix ? `${options.prefix}-${leaf}` : leaf;
 }
