@@ -10,6 +10,10 @@ const SKILLS_ROOT = join(dirname(fromFileUrl(import.meta.url)), "skills");
 const PROJECT_ROOT = Deno.cwd();
 
 if (import.meta.main) {
+  const listCmd = listCommand(SKILLS_ROOT);
+  const copyCmd = copyCommand(SKILLS_ROOT);
+  const newCmd = newCommand(PROJECT_ROOT);
+
   const cli = new Command()
     .name("cc-skills")
     .version("0.1.0")
@@ -18,10 +22,10 @@ if (import.meta.main) {
       const choice = await Select.prompt({
         message: "What do you want to do?",
         options: [
-          { name: "List skills", value: "list" },
-          { name: "Copy skills", value: "copy" },
-          { name: "New skill", value: "new" },
-          { name: "Help", value: "help" },
+          { name: `List skills — ${listCmd.getShortDescription()}`, value: "list" },
+          { name: `Copy skills — ${copyCmd.getShortDescription()}`, value: "copy" },
+          { name: `New skill — ${newCmd.getShortDescription()}`, value: "new" },
+          { name: "Help — Show usage for every command", value: "help" },
         ],
       });
       if (choice === "list") await runList(SKILLS_ROOT);
@@ -30,9 +34,9 @@ if (import.meta.main) {
       else this.showHelp();
     })
     .command("help", new HelpCommand()).global()
-    .command("list", listCommand(SKILLS_ROOT))
-    .command("copy", copyCommand(SKILLS_ROOT))
-    .command("new", newCommand(PROJECT_ROOT));
+    .command("list", listCmd)
+    .command("copy", copyCmd)
+    .command("new", newCmd);
 
   await cli.parse(Deno.args);
 }

@@ -15,10 +15,10 @@ Launches an interactive menu so you don't need to remember the subcommand names 
 ```
 $ deno task cli
 ? What do you want to do?
-❯ List skills
-  Copy skills
-  New skill
-  Help
+❯ List skills — List every skill in this library with its name and description.
+  Copy skills — Copy skills from this library into a project or global skills directory.
+  New skill — Scaffold a new skill under this project's local .claude/skills/ directory.
+  Help — Show usage for every command
 ```
 
 ## `deno task cli list`
