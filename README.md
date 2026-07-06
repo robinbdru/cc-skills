@@ -15,9 +15,40 @@ Launches an interactive menu so you don't need to remember the subcommand names 
 ```
 $ deno task cli
 ? What do you want to do?
-❯ Copy skills
+❯ List skills
+  Copy skills
   New skill
   Help
+```
+
+## `deno task cli list`
+
+Prints every skill in this library as a table, with its name and description
+(pulled from `SKILL.md` frontmatter) — the description column wraps to fit
+your terminal width.
+
+```
+$ deno task cli list
+┌───────────────┬─────────────────────────────────────────────────────────────────────────────────┐
+│ Name          │ Description                                                                     │
+├───────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ commit        │ Analyze working-tree changes and produce clean, atomic git commits in           │
+│               │ Conventional Commits format. Use when the user asks to commit, "make a commit", │
+│               │ "commit my changes", "stage and commit", "wrap up my changes", "save my         │
+│               │ progress", or before any push operation.                                        │
+├───────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ new-skill     │ Scaffolds a new Claude Code skill in this repo's skills/ library, with minimal  │
+│               │ frontmatter and a concise body that pushes detail into supporting files only    │
+│               │ when needed. Use when asked to create, add, write, or scaffold a new skill, or  │
+│               │ to turn a repeated prompt/procedure into a reusable skill for this collection.  │
+├───────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ plan/research │ (no description)                                                                │
+├───────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ refine-skill  │ Audit an existing skill's SKILL.md (and its supporting files) for blind spots,  │
+│               │ contradictions, ambiguity, imprecision, or convention violations, and report    │
+│               │ findings. Use when asked to review, audit, refine, critique, or "find problems  │
+│               │ in" a skill, or to check a skill for issues before shipping it.                 │
+└───────────────┴─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## `deno task cli new [name]`

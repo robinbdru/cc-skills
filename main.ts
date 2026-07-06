@@ -4,6 +4,7 @@ import { Select } from "@cliffy/prompt";
 import { dirname, fromFileUrl, join } from "@std/path";
 import { copyCommand, runCopyWizard } from "./src/commands/copy.ts";
 import { newCommand, runNewWizard } from "./src/commands/new.ts";
+import { listCommand, runList } from "./src/commands/list.ts";
 
 const SKILLS_ROOT = join(dirname(fromFileUrl(import.meta.url)), "skills");
 const PROJECT_ROOT = Deno.cwd();
@@ -17,16 +18,19 @@ if (import.meta.main) {
       const choice = await Select.prompt({
         message: "What do you want to do?",
         options: [
+          { name: "List skills", value: "list" },
           { name: "Copy skills", value: "copy" },
           { name: "New skill", value: "new" },
           { name: "Help", value: "help" },
         ],
       });
-      if (choice === "copy") await runCopyWizard(SKILLS_ROOT);
+      if (choice === "list") await runList(SKILLS_ROOT);
+      else if (choice === "copy") await runCopyWizard(SKILLS_ROOT);
       else if (choice === "new") await runNewWizard(PROJECT_ROOT);
       else this.showHelp();
     })
     .command("help", new HelpCommand()).global()
+    .command("list", listCommand(SKILLS_ROOT))
     .command("copy", copyCommand(SKILLS_ROOT))
     .command("new", newCommand(PROJECT_ROOT));
 
