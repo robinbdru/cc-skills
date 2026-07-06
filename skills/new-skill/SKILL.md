@@ -5,7 +5,7 @@ allowed-tools: Write Edit Read Bash(mkdir *)
 
 # New skill
 
-Scaffold a new skill under `skills/`, following this repo's conventions: a directory is either a **skill** (a leaf folder holding one `SKILL.md`) or a **group** (a folder with no `SKILL.md` of its own that only holds sibling skill folders, e.g. `plan/` holding `plan/research/`) — never both. Keep the body lean and push detail into supporting files only when they earn their token cost.
+Scaffold a new skill under `skills/`, following this repo's conventions: a directory is either a **skill** (a leaf folder holding one `SKILL.md`) or a **group** (a folder with no `SKILL.md` of its own that only holds sibling skill folders, e.g. a hypothetical `foo/` holding `foo/bar/` and `foo/baz/`) — never both. No skill in this library currently uses grouping (all are flat, e.g. `plan-research`, `improve-jsdoc`), but the CLI's discovery logic still supports it — reach for a group only when several skills are tightly-scoped phases of one larger concept. Keep the body lean and push detail into supporting files only when they earn their token cost.
 
 A future CLI will let users pick skills to install into a project or globally, and optionally prefix their names on install. Directory names in this repo are the canonical, unprefixed source — don't bake install-time naming into them.
 
