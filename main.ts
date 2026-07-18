@@ -22,8 +22,14 @@ if (import.meta.main) {
       const choice = await Select.prompt({
         message: "What do you want to do?",
         options: [
-          { name: `List skills — ${listCmd.getShortDescription()}`, value: "list" },
-          { name: `Copy skills — ${copyCmd.getShortDescription()}`, value: "copy" },
+          {
+            name: `List skills — ${listCmd.getShortDescription()}`,
+            value: "list",
+          },
+          {
+            name: `Copy skills — ${copyCmd.getShortDescription()}`,
+            value: "copy",
+          },
           { name: `New skill — ${newCmd.getShortDescription()}`, value: "new" },
           { name: "Help — Show usage for every command", value: "help" },
         ],
