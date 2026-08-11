@@ -1,0 +1,3 @@
+# Per-task research/plan artifacts written by the plan-* skills. They describe a
+# point-in-time state of the code and go stale once the work ships.
+plans/
