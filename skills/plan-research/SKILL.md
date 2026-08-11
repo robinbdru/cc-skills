@@ -19,13 +19,16 @@ work, see the `plan-refine` skill.
 1. Identify the area to study from the request (a folder, a flow, a subsystem).
 2. Read it in depth: entry points, data flow, edge cases, existing conventions, and
    anything relevant to the upcoming change.
-3. If `./plans/<plan-name>/research.md` already exists, read it first and extend or
+3. If genuine open questions surface — ambiguous scope, missing business context, a
+   design choice the code itself doesn't resolve — ask the user directly. Don't guess
+   or silently record an assumption in the file in place of an answer.
+4. If `./plans/<plan-name>/research.md` already exists, read it first and extend or
    update it with new findings rather than overwriting blindly — unless the user asks
    to start over.
-4. Write `./plans/<plan-name>/research.md` covering what the code actually does, its
+5. Write `./plans/<plan-name>/research.md` covering what the code actually does, its
    specificities, and (if asked to look for bugs) a list of concrete issues found —
    don't stop at the first one.
-5. Never substitute a chat summary for the file — `research.md` is the reviewable
+6. Never substitute a chat summary for the file — `research.md` is the reviewable
    artifact the next phase (`plan-write`) and the user both depend on.
 
 ## Example prompt this responds to
