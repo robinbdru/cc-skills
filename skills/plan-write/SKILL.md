@@ -17,6 +17,18 @@ a wrong implementation.
 - Every file path that will be touched
 - Trade-offs and considerations worth the user's attention
 
+## Running in a subagent
+
+An orchestrating session, usually `plan-full`, normally runs this phase in a subagent on
+the model it picked for the phase. The subagent can't reach the user. Where this skill
+says to ask the user, collect the question instead, finish the work it doesn't block, and
+return. End the run with a report the orchestrator can relay at its gate: the file
+written, a short summary, and the open questions, or "none".
+
+If `research.md` is missing and the change needs one, return that as an open question
+instead of running `plan-research` yourself, so the orchestrator dispatches research on
+its own model.
+
 ## Workflow
 
 1. Read `research.md` if present. If it's missing and the change touches more than a couple

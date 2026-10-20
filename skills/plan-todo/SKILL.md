@@ -7,6 +7,14 @@ description: Append a granular, phase-by-phase todo list to ./plans/<name>/plan.
 Break the approved `plan.md` into a granular, checkable task list appended to the same
 file. This becomes the progress tracker `implement-plan` marks off as it works.
 
+## Running in a subagent
+
+An orchestrating session, usually `plan-full`, normally runs this phase in a subagent on
+the model it picked for the phase. The subagent can't reach the user. Where this skill
+says to ask the user, collect the question instead, finish the work it doesn't block, and
+return. End the run with a report the orchestrator can relay at its gate: the file
+written, a short summary, and the open questions, or "none".
+
 ## Workflow
 
 1. Read the finished `./plans/<plan-name>/plan.md`.

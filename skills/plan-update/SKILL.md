@@ -9,6 +9,14 @@ have, corrections to wrong assumptions, rejected approaches, added constraints, 
 redirected sections. Read the whole file to find every note before changing anything, since
 they're often scattered rather than collected at the top.
 
+## Running in a subagent
+
+An orchestrating session, usually `plan-full`, normally runs this phase in a subagent on
+the model it picked for the phase. The subagent can't reach the user. Where this skill
+says to ask the user, collect the question instead, finish the work it doesn't block, and
+return. End the run with a report the orchestrator can relay at its gate: the file
+written, a short summary, and the open questions, or "none".
+
 ## Workflow
 
 1. Read the current `./plans/<plan-name>/plan.md` in full.

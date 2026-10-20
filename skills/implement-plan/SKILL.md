@@ -9,6 +9,14 @@ been made, so implementation should be boring, not exploratory. For the groundin
 discipline this phase still relies on (verify names, types, and call sites against the real
 code, don't invent APIs), see `plan-refine`.
 
+## Running in a subagent
+
+An orchestrating session, usually `plan-full`, normally runs this phase in a subagent on
+the model it picked for the phase. The subagent can't reach the user. Where this skill
+says to ask the user, collect the question instead, finish the work it doesn't block, and
+return. End the run with a report the orchestrator can relay at its gate: the file
+written, a short summary, and the open questions, or "none".
+
 ## Workflow
 
 1. Work through the plan's phases and tasks in order. Don't cherry-pick. Implement

@@ -15,6 +15,14 @@ them. The same standard applies to anything the code can't answer: look up how t
 is solved elsewhere rather than proposing a design from memory. For that grounding
 discipline applied to ad hoc work outside this pipeline, see the `plan-refine` skill.
 
+## Running in a subagent
+
+An orchestrating session, usually `plan-full`, normally runs this phase in a subagent on
+the model it picked for the phase. The subagent can't reach the user. Where this skill
+says to ask the user, collect the question instead, finish the work it doesn't block, and
+return. End the run with a report the orchestrator can relay at its gate: the file
+written, a short summary, and the open questions, or "none".
+
 ## Workflow
 
 1. Identify the area to study from the request (a folder, a flow, a subsystem).
