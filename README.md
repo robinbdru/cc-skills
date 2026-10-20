@@ -9,12 +9,16 @@ across projects. The `cc-skills` CLI copies them into a project or into `~/.clau
 - `src/` holds the `cc-skills` CLI: skill discovery, copy, and scaffold logic, plus tests.
 - `main.ts` is the CLI entry point.
 
-## `deno task cli`
+## Setup
+
+The CLI runs on [Bun](https://bun.sh). Run `bun install` once to fetch its dependencies. `bun test` runs the test suite and `bun run typecheck` checks types, since Bun runs TypeScript without checking it.
+
+## `bun run cli`
 
 Launches an interactive menu so you don't have to remember the subcommand names. Pick "Copy skills" or "New skill" and it hands off to the matching subcommand below.
 
 ```
-$ deno task cli
+$ bun run cli
 ? What do you want to do?
 ❯ List skills — List every skill in this library with its name and description.
   Copy skills — Copy skills from this library into a project or global skills directory.
@@ -22,14 +26,14 @@ $ deno task cli
   Help — Show usage for every command
 ```
 
-## `deno task cli list`
+## `bun run cli list`
 
 Prints every skill as a table with its name and description, both read from `SKILL.md`
 frontmatter. The description column wraps to fit your terminal width, so the table below is
 narrower than what you get on a wide terminal.
 
 ```
-$ deno task cli list
+$ bun run cli list
 ┌────────────────────────────┬─────────────────────────────────────────────────────────────────────┐
 │ Name                       │ Description                                                         │
 ├────────────────────────────┼─────────────────────────────────────────────────────────────────────┤
@@ -43,7 +47,7 @@ $ deno task cli list
 ... plus the rest of the library
 ```
 
-## `deno task cli new [name]`
+## `bun run cli new [name]`
 
 Scaffolds a new skill's `SKILL.md` under the current project's local `.claude/skills/`. The `new-skill` skill (`skills/new-skill/`) documents the authoring conventions this scaffolder follows.
 
@@ -52,11 +56,11 @@ Scaffolds a new skill's `SKILL.md` under the current project's local `.claude/sk
 - **Overwrite its SKILL.md?** Asked only when the skill already exists, so you don't clobber existing work.
 
 ```
-$ deno task cli new my-skill
+$ bun run cli new my-skill
 Created /Users/you/my-project/.claude/skills/my-skill/SKILL.md
 ```
 
-## `deno task cli copy`
+## `bun run cli copy`
 
 Copies skills from this library's `skills/` into another project's `.claude/skills/` directory, or your global one.
 
@@ -66,7 +70,7 @@ Copies skills from this library's `skills/` into another project's `.claude/skil
 - When the destination folder already exists, the CLI asks whether to overwrite every conflict or decide one by one, then prints the full copy plan for confirmation before writing anything.
 
 ```
-$ deno task cli copy
+$ bun run cli copy
 ? Which skills do you want to copy? › All skills
 ? Destination folder (a .claude/skills/ folder will be found or created inside it) › ../other-project
 ? Prefix to prepend to copied skill names (leave empty for none) › 

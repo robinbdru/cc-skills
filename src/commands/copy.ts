@@ -1,7 +1,8 @@
-import { Command } from "@cliffy/command";
-import { Checkbox, Confirm, Input, Select } from "@cliffy/prompt";
-import { ensureDir } from "@std/fs";
-import { join } from "@std/path";
+import { mkdir } from "node:fs/promises";
+import { join } from "node:path";
+import { checkbox, confirm, input, select } from "@inquirer/prompts";
+import { Command } from "commander";
+import { isNotFound } from "../fs.ts";
 import { discoverSkills, targetDirName, type SkillEntry } from "../skills.ts";
 import { copySkillTo, expandHome, targetExists } from "../copy.ts";
 
@@ -15,30 +16,30 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
   try {
     skills = await discoverSkills(skillsRoot);
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) {
+    if (isNotFound(error)) {
       console.error(`Skills folder not found: ${skillsRoot}`);
-      Deno.exit(1);
+      process.exit(1);
     }
     throw error;
   }
 
   if (skills.length === 0) {
     console.error(`No skills found under ${skillsRoot}`);
-    Deno.exit(1);
+    process.exit(1);
   }
 
-  const scope = await Select.prompt({
+  const scope = await select({
     message: "Which skills do you want to copy?",
-    options: [
+    choices: [
       { name: "All skills", value: "all" },
       { name: "Choose which skills", value: "choose" },
     ],
   });
   const selectedNames = scope === "all"
     ? skills.map((s) => s.name)
-    : await Checkbox.prompt({
+    : await checkbox({
       message: "Select skills to copy",
-      options: skills.map((s) => ({ name: s.name, value: s.name })),
+      choices: skills.map((s) => ({ name: s.name, value: s.name })),
     });
   if (selectedNames.length === 0) {
     console.log("Nothing selected.");
@@ -46,7 +47,7 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
   }
   const selected = skills.filter((s) => selectedNames.includes(s.name));
 
-  const rawDestination = await Input.prompt({
+  const rawDestination = await input({
     message: "Destination folder (a .claude/skills/ folder will be found or created inside it)",
   });
   let destination: string;
@@ -54,10 +55,10 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
     destination = join(expandHome(rawDestination), ".claude", "skills");
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    Deno.exit(1);
+    process.exit(1);
   }
 
-  const prefixInput = await Input.prompt({
+  const prefixInput = await input({
     message: "Prefix to prepend to copied skill names (leave empty for none)",
     default: "",
   });
@@ -83,9 +84,9 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
   const existsChecks = await Promise.all(plan.map((p) => targetExists(destination, p.dirName)));
   const conflicts = new Set(plan.filter((_, i) => existsChecks[i]).map((p) => p.dirName));
 
-  const overwriteAll = conflicts.size === 0 || (await Select.prompt({
+  const overwriteAll = conflicts.size === 0 || (await select({
     message: `${conflicts.size} destination folder(s) already exist (${[...conflicts].join(", ")}). Overwrite?`,
-    options: [
+    choices: [
       { name: "Overwrite all", value: "all" },
       { name: "Decide one by one", value: "ask" },
     ],
@@ -97,20 +98,20 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
   }
   console.log(`Prefix: ${prefix ?? "(none)"}`);
   console.log(`Destination: ${destination}`);
-  const proceed = await Confirm.prompt("Proceed?");
+  const proceed = await confirm({ message: "Proceed?", default: false });
   if (!proceed) {
     console.log("Aborted.");
     return;
   }
 
-  await ensureDir(destination);
+  await mkdir(destination, { recursive: true });
   for (const { skill, dirName } of plan) {
     const target = join(destination, dirName);
     const conflicted = conflicts.has(dirName);
 
     let overwrite = overwriteAll;
     if (conflicted && !overwriteAll) {
-      overwrite = await Confirm.prompt(`Overwrite ${dirName}?`);
+      overwrite = await confirm({ message: `Overwrite ${dirName}?`, default: false });
       if (!overwrite) {
         console.log(`Skipped ${skill.name}`);
         continue;
@@ -123,9 +124,8 @@ export async function runCopyWizard(skillsRoot: string): Promise<void> {
 }
 
 /** Builds the `copy` subcommand, wired to run the interactive wizard against `skillsRoot`. */
-// No return-type annotation: Cliffy's fluent Command generics need it inferred (see ../deno-cli/research.md).
-export function copyCommand(skillsRoot: string) {
-  return new Command()
+export function copyCommand(skillsRoot: string): Command {
+  return new Command("copy")
     .description("Copy skills from this library into a project or global skills directory.")
     .action(() => runCopyWizard(skillsRoot));
 }

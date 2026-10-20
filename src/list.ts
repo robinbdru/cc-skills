@@ -1,4 +1,5 @@
-import { join } from "@std/path";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { discoverSkills, type SkillEntry } from "./skills.ts";
 
 /** A skill entry enriched with its parsed description. */
@@ -30,7 +31,7 @@ function parseFrontmatterField(content: string, field: string): string | undefin
 
 /** Reads a skill's description from its SKILL.md, or "" if absent/unparsable. */
 export async function readSkillDescription(skillDir: string): Promise<string> {
-  const content = await Deno.readTextFile(join(skillDir, "SKILL.md"));
+  const content = await readFile(join(skillDir, "SKILL.md"), "utf8");
   return parseFrontmatterField(content, "description") ?? "";
 }
 

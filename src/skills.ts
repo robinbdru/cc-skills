@@ -1,4 +1,6 @@
-import { join } from "@std/path";
+import type { Dirent } from "node:fs";
+import { readdir, stat } from "node:fs/promises";
+import { join } from "node:path";
 
 /** A leaf skill directory: contains a SKILL.md, never nested skills. */
 export interface SkillEntry {
@@ -10,14 +12,14 @@ export interface SkillEntry {
 
 /**
  * Whether `entry` (found in `dir`) is a directory, following symlinks —
- * `Deno.DirEntry.isDirectory` is false for a symlink even when it points at
+ * `Dirent.isDirectory()` is false for a symlink even when it points at
  * a directory. A broken symlink is treated as "not a directory".
  */
-async function isDirectory(dir: string, entry: Deno.DirEntry): Promise<boolean> {
-  if (entry.isDirectory) return true;
-  if (!entry.isSymlink) return false;
+async function isDirectory(dir: string, entry: Dirent): Promise<boolean> {
+  if (entry.isDirectory()) return true;
+  if (!entry.isSymbolicLink()) return false;
   try {
-    return (await Deno.stat(join(dir, entry.name))).isDirectory;
+    return (await stat(join(dir, entry.name))).isDirectory();
   } catch {
     return false;
   }
@@ -36,8 +38,8 @@ export async function discoverSkills(skillsRoot: string): Promise<SkillEntry[]> 
     let hasSkillMd = false;
     const subdirs: string[] = [];
 
-    for await (const entry of Deno.readDir(dir)) {
-      if (entry.isFile && entry.name === "SKILL.md") {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name === "SKILL.md") {
         hasSkillMd = true;
       } else if (await isDirectory(dir, entry)) {
         subdirs.push(entry.name);
@@ -54,7 +56,7 @@ export async function discoverSkills(skillsRoot: string): Promise<SkillEntry[]> 
     }
   }
 
-  for await (const entry of Deno.readDir(skillsRoot)) {
+  for (const entry of await readdir(skillsRoot, { withFileTypes: true })) {
     if (await isDirectory(skillsRoot, entry)) {
       await walk(join(skillsRoot, entry.name), [entry.name]);
     }

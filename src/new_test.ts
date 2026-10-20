@@ -1,94 +1,96 @@
-import { assertEquals, assertThrows } from "@std/assert";
-import { join } from "@std/path";
+import { expect, test } from "bun:test";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { findSkillConflict, scaffoldSkill, skillExists, skillStub, validateSkillName } from "./new.ts";
 
-Deno.test("validateSkillName accepts hyphenated lowercase names, with or without a group", () => {
+test("validateSkillName accepts hyphenated lowercase names, with or without a group", () => {
   validateSkillName("new-skill");
   validateSkillName("group/new-skill");
 });
 
-Deno.test("validateSkillName rejects invalid segments", () => {
+test("validateSkillName rejects invalid segments", () => {
   for (const name of ["New-Skill", "new_skill", "new skill", "", "group//skill", "/skill", "skill/", "..", "."]) {
-    assertThrows(() => validateSkillName(name), Error, "Invalid skill name");
+    expect(() => validateSkillName(name)).toThrow("Invalid skill name");
   }
 });
 
-Deno.test("scaffoldSkill creates the directory and a SKILL.md stub", async () => {
-  const root = await Deno.makeTempDir();
+test("scaffoldSkill creates the directory and a SKILL.md stub", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     const dir = await scaffoldSkill(root, "new-skill");
-    assertEquals(dir, join(root, "new-skill"));
-    const content = await Deno.readTextFile(join(dir, "SKILL.md"));
-    assertEquals(content.startsWith("---\nname: new-skill"), true);
-    assertEquals(content.includes("Your skill instructions here..."), true);
+    expect(dir).toEqual(join(root, "new-skill"));
+    const content = await readFile(join(dir, "SKILL.md"), "utf8");
+    expect(content.startsWith("---\nname: new-skill")).toEqual(true);
+    expect(content.includes("Your skill instructions here...")).toEqual(true);
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("skillStub fills in the name field from the template and keeps the rest", async () => {
+test("skillStub fills in the name field from the template and keeps the rest", async () => {
   const stub = await skillStub("new-skill");
-  assertEquals(stub.startsWith("---\nname: new-skill"), true);
-  assertEquals(stub.includes("description:"), true);
-  assertEquals(stub.includes("Your skill instructions here..."), true);
+  expect(stub.startsWith("---\nname: new-skill")).toEqual(true);
+  expect(stub.includes("description:")).toEqual(true);
+  expect(stub.includes("Your skill instructions here...")).toEqual(true);
 });
 
-Deno.test("skillStub uses the leaf name for a grouped skill", async () => {
+test("skillStub uses the leaf name for a grouped skill", async () => {
   const stub = await skillStub("group/new-skill");
-  assertEquals(stub.startsWith("---\nname: new-skill"), true);
+  expect(stub.startsWith("---\nname: new-skill")).toEqual(true);
 });
 
-Deno.test("scaffoldSkill creates nested group directories", async () => {
-  const root = await Deno.makeTempDir();
+test("scaffoldSkill creates nested group directories", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     const dir = await scaffoldSkill(root, "group/new-skill");
-    assertEquals(dir, join(root, "group", "new-skill"));
-    assertEquals(await skillExists(root, "group/new-skill"), true);
+    expect(dir).toEqual(join(root, "group", "new-skill"));
+    expect(await skillExists(root, "group/new-skill")).toEqual(true);
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("scaffoldSkill overwrites an existing SKILL.md", async () => {
-  const root = await Deno.makeTempDir();
+test("scaffoldSkill overwrites an existing SKILL.md", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     await scaffoldSkill(root, "new-skill");
-    await Deno.writeTextFile(join(root, "new-skill", "SKILL.md"), "stale content");
+    await writeFile(join(root, "new-skill", "SKILL.md"), "stale content");
 
     await scaffoldSkill(root, "new-skill");
 
-    const content = await Deno.readTextFile(join(root, "new-skill", "SKILL.md"));
-    assertEquals(content.includes("stale content"), false);
+    const content = await readFile(join(root, "new-skill", "SKILL.md"), "utf8");
+    expect(content.includes("stale content")).toEqual(false);
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("skillExists is false when there's no SKILL.md yet", async () => {
-  const root = await Deno.makeTempDir();
+test("skillExists is false when there's no SKILL.md yet", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
-    assertEquals(await skillExists(root, "new-skill"), false);
+    expect(await skillExists(root, "new-skill")).toEqual(false);
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("findSkillConflict detects an ancestor that's already a skill", async () => {
-  const root = await Deno.makeTempDir();
+test("findSkillConflict detects an ancestor that's already a skill", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     await scaffoldSkill(root, "existing-skill");
-    assertEquals(await findSkillConflict(root, "existing-skill/nested"), "existing-skill");
+    expect(await findSkillConflict(root, "existing-skill/nested")).toEqual("existing-skill");
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("findSkillConflict returns undefined for a fresh group or top-level name", async () => {
-  const root = await Deno.makeTempDir();
+test("findSkillConflict returns undefined for a fresh group or top-level name", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
-    assertEquals(await findSkillConflict(root, "new-skill"), undefined);
-    assertEquals(await findSkillConflict(root, "group/new-skill"), undefined);
+    expect(await findSkillConflict(root, "new-skill")).toBeUndefined();
+    expect(await findSkillConflict(root, "group/new-skill")).toBeUndefined();
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });

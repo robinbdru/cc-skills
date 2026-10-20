@@ -1,9 +1,10 @@
-import { ensureDir, exists } from "@std/fs";
-import { dirname, fromFileUrl, join } from "@std/path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { exists } from "./fs.ts";
 
 const SEGMENT_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-const TEMPLATE_PATH = join(dirname(fromFileUrl(import.meta.url)), "..", "skills", "new-skill", "template.md");
+const TEMPLATE_PATH = join(import.meta.dir, "..", "skills", "new-skill", "template.md");
 
 /**
  * Validates a skill name or path like "new-skill" or "group/new-skill":
@@ -22,7 +23,7 @@ export function validateSkillName(name: string): void {
 /** Builds a `SKILL.md` stub from this repo's skill template, filling in `name` with the skill's leaf directory name. */
 export async function skillStub(name: string): Promise<string> {
   const leaf = name.split("/").at(-1)!;
-  const template = await Deno.readTextFile(TEMPLATE_PATH);
+  const template = await readFile(TEMPLATE_PATH, "utf8");
   return template.replace("my-skill-name", leaf);
 }
 
@@ -48,7 +49,7 @@ export function skillExists(skillsRoot: string, name: string): Promise<boolean> 
 /** Creates `skillsRoot/<name>/SKILL.md` with minimal stub content, overwriting any existing file. Returns the skill's directory. */
 export async function scaffoldSkill(skillsRoot: string, name: string): Promise<string> {
   const dir = join(skillsRoot, ...name.split("/"));
-  await ensureDir(dir);
-  await Deno.writeTextFile(join(dir, "SKILL.md"), await skillStub(name));
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, "SKILL.md"), await skillStub(name));
   return dir;
 }

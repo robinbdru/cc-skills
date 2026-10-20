@@ -1,70 +1,72 @@
-import { assertEquals, assertThrows } from "@std/assert";
-import { exists } from "@std/fs";
-import { join } from "@std/path";
+import { expect, test } from "bun:test";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { copySkillTo, expandHome } from "./copy.ts";
+import { exists } from "./fs.ts";
 
-Deno.test("expandHome expands a leading ~ using HOME", () => {
-  const original = Deno.env.get("HOME");
-  Deno.env.set("HOME", "/home/testuser");
+test("expandHome expands a leading ~ using HOME", () => {
+  const original = process.env.HOME;
+  process.env.HOME = "/home/testuser";
   try {
-    assertEquals(expandHome("~"), "/home/testuser");
-    assertEquals(expandHome("~/.claude/skills"), "/home/testuser/.claude/skills");
+    expect(expandHome("~")).toEqual("/home/testuser");
+    expect(expandHome("~/.claude/skills")).toEqual("/home/testuser/.claude/skills");
   } finally {
-    if (original === undefined) Deno.env.delete("HOME");
-    else Deno.env.set("HOME", original);
+    if (original === undefined) delete process.env.HOME;
+    else process.env.HOME = original;
   }
 });
 
-Deno.test("expandHome leaves other paths unchanged", () => {
-  assertEquals(expandHome("./dest"), "./dest");
-  assertEquals(expandHome("/abs/dest"), "/abs/dest");
-  assertEquals(expandHome("~user/dest"), "~user/dest");
+test("expandHome leaves other paths unchanged", () => {
+  expect(expandHome("./dest")).toEqual("./dest");
+  expect(expandHome("/abs/dest")).toEqual("/abs/dest");
+  expect(expandHome("~user/dest")).toEqual("~user/dest");
 });
 
-Deno.test("expandHome throws when HOME is unset", () => {
-  const original = Deno.env.get("HOME");
-  Deno.env.delete("HOME");
+test("expandHome throws when HOME is unset", () => {
+  const original = process.env.HOME;
+  delete process.env.HOME;
   try {
-    assertThrows(() => expandHome("~/foo"), Error, "HOME");
+    expect(() => expandHome("~/foo")).toThrow("HOME");
   } finally {
-    if (original !== undefined) Deno.env.set("HOME", original);
+    if (original !== undefined) process.env.HOME = original;
   }
 });
 
-Deno.test("copySkillTo copies a fresh directory", async () => {
-  const root = await Deno.makeTempDir();
+test("copySkillTo copies a fresh directory", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     const source = join(root, "source");
     const target = join(root, "target");
-    await Deno.mkdir(source);
-    await Deno.writeTextFile(join(source, "SKILL.md"), "hello");
+    await mkdir(source);
+    await writeFile(join(source, "SKILL.md"), "hello");
 
     await copySkillTo(source, target, { overwrite: false });
 
-    assertEquals(await Deno.readTextFile(join(target, "SKILL.md")), "hello");
+    expect(await readFile(join(target, "SKILL.md"), "utf8")).toEqual("hello");
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
 
-Deno.test("copySkillTo with overwrite removes stale files instead of merging", async () => {
-  const root = await Deno.makeTempDir();
+test("copySkillTo with overwrite removes stale files instead of merging", async () => {
+  const root = await mkdtemp(join(tmpdir(), "cc-skills-"));
   try {
     const source = join(root, "source");
     const target = join(root, "target");
-    await Deno.mkdir(source);
-    await Deno.writeTextFile(join(source, "SKILL.md"), "updated");
+    await mkdir(source);
+    await writeFile(join(source, "SKILL.md"), "updated");
 
     // Pre-existing target has a file the new source no longer has.
-    await Deno.mkdir(target);
-    await Deno.writeTextFile(join(target, "SKILL.md"), "old");
-    await Deno.writeTextFile(join(target, "stale.md"), "leftover");
+    await mkdir(target);
+    await writeFile(join(target, "SKILL.md"), "old");
+    await writeFile(join(target, "stale.md"), "leftover");
 
     await copySkillTo(source, target, { overwrite: true });
 
-    assertEquals(await Deno.readTextFile(join(target, "SKILL.md")), "updated");
-    assertEquals(await exists(join(target, "stale.md")), false);
+    expect(await readFile(join(target, "SKILL.md"), "utf8")).toEqual("updated");
+    expect(await exists(join(target, "stale.md"))).toEqual(false);
   } finally {
-    await Deno.remove(root, { recursive: true });
+    await rm(root, { recursive: true });
   }
 });
