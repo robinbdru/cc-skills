@@ -1,5 +1,5 @@
 ---
-description: Grounds any design, refactor, implementation, debugging, or review task in the actual codebase instead of assumptions. Use for ad-hoc coding work where you want every step verified against real files, types, and tests before and after changes — not memory-based guesses about APIs, file names, or conventions.
+description: Grounds any design, refactor, implementation, debugging, or review task in the actual codebase instead of assumptions. Use for ad-hoc coding work where you want every step verified against real files, types, and tests before and after changes — not memory-based guesses about APIs, file names, or conventions. Also use when the task comes with an existing plan, such as ./plans/<name>/plan.md, that needs grounding: check each of its steps against the code and correct the plan where it doesn't hold.
 ---
 
 # Plan: refine
@@ -10,6 +10,9 @@ artifacts and phase-by-phase approval, use the `plan-full` skill instead (or its
 component phases — `plan-research`, `plan-write`, `plan-update`, `plan-todo`,
 `implement-plan` — individually) — this skill is the lightweight, always-applicable
 version of the same discipline.
+
+The task can come with a plan already written, by `plan-write` or by hand. Then the plan
+is what gets grounded: see [Grounding a plan](#grounding-a-plan).
 
 ## Workflow
 
@@ -33,6 +36,25 @@ version of the same discipline.
    update tests where appropriate, run the narrowest relevant validation first
    (typecheck → targeted tests → lint → broader checks). State plainly what couldn't be
    run.
+
+## Grounding a plan
+
+When the task is tied to a plan, such as `./plans/<plan-name>/plan.md`, ground the plan
+itself before any code is written against it.
+
+1. Read the whole plan, including its `## Todo` if it has one, then run steps 1 to 3 of
+   the workflow on every step it names: files, symbols, signatures, call sites, and the
+   integration points it relies on.
+2. Correct the plan in place where the code contradicts it: wrong paths or names, a
+   signature that differs, a missed call site, an existing implementation to extend
+   rather than rewrite. Mark what couldn't be verified instead of leaving it as fact.
+3. Keep the plan's structure. Leave the `## Todo` checkboxes in their format and keep
+   every tick as it is, so progress tracking stays accurate; reword or add tasks rather
+   than ticking or unticking them.
+4. Don't implement while grounding. Steps 4 and 5 apply only once the user asks to build
+   from the grounded plan.
+5. Report each change made to the plan, what it was based on (file and symbol), and the
+   points left unverified.
 
 ## When presenting a plan or summary
 
