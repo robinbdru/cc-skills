@@ -64,13 +64,17 @@ decisions already made. Typical deviations:
   detail.
 - Write on `sonnet` when the change touches a couple of files and follows an existing
   convention.
-- Implement on `opus` when the plan leaves subtle code to write, such as concurrency,
-  auth, or a data migration.
+- Implement on `opus` only after a `sonnet` attempt failed at the same step: say which
+  step failed and why. Concurrency, auth and data migrations start on `sonnet` too; the
+  measured cost of an `opus` implement agent is 2.8 times a `sonnet` one per request.
 - A rerun on `opus` when the user rejects a Sonnet phase's output at its gate for a
   reasoning error. A missing fact calls for a rerun with that fact, not a bigger model.
 
 Use `xhigh` for a phase that weighs competing designs and `high` for the rest. State the
-model and effort in one line before each dispatch, so the user can override them.
+model, the effort and a request cap (150 for an implement agent; it stops, writes a
+handoff note and reports) in one line before each dispatch, so the user can override
+them. Run at most one `opus` agent at a time, and do not park an agent past the prompt
+cache lifetime (about an hour): a revived agent replays its whole context uncached.
 
 ## Workflow
 
